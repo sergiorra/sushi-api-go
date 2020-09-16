@@ -48,11 +48,10 @@ func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for i, item := range sushis {
 		if item.ID == params["id"] {
-			sushis = append(sushis[:i], sushis[i+1:]...)
 			newSushi := Sushi{}
 			json.NewDecoder(r.Body).Decode(&newSushi)
 			newSushi.ID = params["id"]
-			sushis = append(sushis, newSushi)
+			sushis[i] = newSushi
 			json.NewEncoder(w).Encode(newSushi)
 			return
 		}
