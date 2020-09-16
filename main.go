@@ -16,17 +16,17 @@ type Sushi struct {
 	Ingredients string `json:"ingredients"`
 }
 
-var sushis []Sushi
+var sushiData []Sushi
 
 func getAllSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(sushis)
+	json.NewEncoder(w).Encode(sushiData)
 }
 
 func getSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for _, item := range sushis {
+	for _, item := range sushiData {
 		if item.ID == params["id"] {
 			json.NewEncoder(w).Encode(item)
 			return
@@ -39,20 +39,20 @@ func createSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	newSushi := Sushi{}
 	json.NewDecoder(r.Body).Decode(&newSushi)
-	newSushi.ID = strconv.Itoa(len(sushis)+1)
-	sushis = append(sushis, newSushi)
+	newSushi.ID = strconv.Itoa(len(sushiData)+1)
+	sushiData = append(sushiData, newSushi)
 	json.NewEncoder(w).Encode(newSushi)
 }
 
 func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for i, item := range sushis {
+	for i, item := range sushiData {
 		if item.ID == params["id"] {
 			newSushi := Sushi{}
 			json.NewDecoder(r.Body).Decode(&newSushi)
 			newSushi.ID = params["id"]
-			sushis[i] = newSushi
+			sushiData[i] = newSushi
 			json.NewEncoder(w).Encode(newSushi)
 			return
 		}
@@ -63,10 +63,10 @@ func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for i, item := range sushis {
+	for i, item := range sushiData {
 		if item.ID == params["id"] {
-			sushis = append(sushis[:i], sushis[i+1:]...)
-			json.NewEncoder(w).Encode(sushis)
+			sushiData = append(sushiData[:i], sushiData[i+1:]...)
+			json.NewEncoder(w).Encode(sushiData)
 			return
 		}
 	}
