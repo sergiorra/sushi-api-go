@@ -44,11 +44,31 @@ func createSushiHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	for i, item := range sushis {
+		if item.ID == params["id"] {
+			sushis = append(sushis[:i], sushis[i+1:]...)
+			newSushi := Sushi{}
+			json.NewDecoder(r.Body).Decode(&newSushi)
+			newSushi.ID = params["id"]
+			sushis = append(sushis, newSushi)
+			json.NewEncoder(w).Encode(newSushi)
+			return
+		}
+	}
 }
 
 func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	for i, item := range sushis {
+		if item.ID == params["id"] {
+			sushis = append(sushis[:i], sushis[i+1:]...)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(sushis)
 }
 
 func main() {
@@ -59,7 +79,7 @@ func main() {
 	router.HandleFunc("/sushi", getAllSushiHandler).Methods("GET")
 	router.HandleFunc("/sushi/{id}", getSushiHandler).Methods("GET")
 	router.HandleFunc("/sushi", createSushiHandler).Methods("POST")
-	router.HandleFunc("/sushi/{id}", updateSushiHandler).Methods("UPDATE")
+	router.HandleFunc("/sushi/{id}", updateSushiHandler).Methods("PUT")
 	router.HandleFunc("/sushi/{id}", deleteSushiHandler).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":5000", router))
