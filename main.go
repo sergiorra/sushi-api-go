@@ -19,15 +19,28 @@ type Sushi struct {
 var sushis []Sushi
 
 func getAllSushiHandler(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(sushis)
 }
 
 func getSushiHandler(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	for _, item := range sushis {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
 }
 
 func createSushiHandler(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/json")
+	newSushi := Sushi{}
+	json.NewDecoder(r.Body).Decode(&newSushi)
+	newSushi.ID = strconv.Itoa(len(sushis)+1)
+	sushis = append(sushis, newSushi)
+	json.NewEncoder(w).Encode(newSushi)
 }
 
 func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
