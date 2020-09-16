@@ -10,7 +10,7 @@ import (
 )
 
 type Sushi struct {
-	ID          string `json:"id"`
+	ID          int `json:"id"`
 	ImageNumber string `json:"imageNumber"`
 	Name        string `json:"name"`
 	Ingredients []string `json:"ingredients"`
@@ -26,51 +26,67 @@ func getAllSushiHandler(w http.ResponseWriter, r *http.Request) {
 func getSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	for _, item := range sushiData {
-		if item.ID == params["id"] {
+		if item.ID == id {
 			json.NewEncoder(w).Encode(item)
 			return
 		}
 	}
-	http.NotFound(w, r)
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func createSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	newSushi := Sushi{}
 	json.NewDecoder(r.Body).Decode(&newSushi)
-	newSushi.ID = strconv.Itoa(len(sushiData)+1)
+	newSushi.ID = len(sushiData)+1
 	sushiData = append(sushiData, newSushi)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newSushi)
 }
 
 func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	for i, item := range sushiData {
-		if item.ID == params["id"] {
+		if item.ID == id {
 			newSushi := Sushi{}
 			json.NewDecoder(r.Body).Decode(&newSushi)
-			newSushi.ID = params["id"]
+			newSushi.ID = id
 			sushiData[i] = newSushi
 			json.NewEncoder(w).Encode(newSushi)
 			return
 		}
 	}
-	http.NotFound(w, r)
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	for i, item := range sushiData {
-		if item.ID == params["id"] {
+		if item.ID == id{
 			sushiData = append(sushiData[:i], sushiData[i+1:]...)
 			json.NewEncoder(w).Encode(sushiData)
 			return
 		}
 	}
-	http.NotFound(w, r)
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func main() {
