@@ -32,6 +32,7 @@ func getSushiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func createSushiHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,6 +57,7 @@ func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,10 +66,11 @@ func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
 	for i, item := range sushis {
 		if item.ID == params["id"] {
 			sushis = append(sushis[:i], sushis[i+1:]...)
+			json.NewEncoder(w).Encode(sushis)
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(sushis)
+	w.WriteHeader(http.StatusNotFound)
 }
 
 func main() {
