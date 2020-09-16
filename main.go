@@ -13,7 +13,7 @@ type Sushi struct {
 	ID          string `json:"id"`
 	ImageNumber string `json:"imageNumber"`
 	Name        string `json:"name"`
-	Ingredients string `json:"ingredients"`
+	Ingredients []string `json:"ingredients"`
 }
 
 var sushiData []Sushi
@@ -32,7 +32,7 @@ func getSushiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	w.WriteHeader(http.StatusNotFound)
+	http.NotFound(w, r)
 }
 
 func createSushiHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func updateSushiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	w.WriteHeader(http.StatusNotFound)
+	http.NotFound(w, r)
 }
 
 func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +70,7 @@ func deleteSushiHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	w.WriteHeader(http.StatusNotFound)
+	http.NotFound(w, r)
 }
 
 func main() {
