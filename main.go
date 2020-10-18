@@ -94,11 +94,11 @@ func main() {
 	router := mux.NewRouter()
 
 	// endpoints
-	router.HandleFunc("/sushi", getAllSushiHandler).Methods("GET")
-	router.HandleFunc("/sushi/{id}", getSushiHandler).Methods("GET")
-	router.HandleFunc("/sushi", createSushiHandler).Methods("POST")
-	router.HandleFunc("/sushi/{id}", updateSushiHandler).Methods("PUT")
-	router.HandleFunc("/sushi/{id}", deleteSushiHandler).Methods("DELETE")
+	router.HandleFunc("/sushi", getAllSushiHandler).Methods(http.MethodGet)
+	router.HandleFunc("/sushi/{id}", getSushiHandler).Methods(http.MethodGet)
+	router.HandleFunc("/sushi", createSushiHandler).Methods(http.MethodPost)
+	router.HandleFunc("/sushi/{id}", updateSushiHandler).Methods(http.MethodPut)
+	router.HandleFunc("/sushi/{id}", deleteSushiHandler).Methods(http.MethodDelete)
 
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
