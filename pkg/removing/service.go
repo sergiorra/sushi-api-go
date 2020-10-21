@@ -1,20 +1,20 @@
 package removing
 
 import (
-	gopher "github.com/sergiorra/sushi-api-go/pkg"
+	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
-// Service provides removing operations.
+// Service provides removing operations
 type Service interface {
 	RemoveSushi(ID string) error
 }
 
 type service struct {
-	repository gopher.Repository
+	repository sushi.Repository
 }
 
 // NewService creates a removing service with the necessary dependencies
-func NewService(repository gopher.Repository) Service {
+func NewService(repository sushi.Repository) Service {
 	return &service{repository}
 }
 

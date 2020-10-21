@@ -4,7 +4,7 @@ import (
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
-// Service provides modifying operations.
+// Service provides modifying operations
 type Service interface {
 	ModifySushi(ID, ImageNumber, Name string, Ingredients []string) error
 }

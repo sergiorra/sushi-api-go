@@ -4,7 +4,7 @@ import (
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
-// Service provides getting operations.
+// Service provides getting operations
 type Service interface {
 	GetSushis() ([]sushi.Sushi, error)
 	GetSushiByID(ID string) (*sushi.Sushi, error)
