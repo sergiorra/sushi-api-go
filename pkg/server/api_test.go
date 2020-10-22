@@ -9,15 +9,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/sergiorra/sushi-api-go/pkg/removing"
-
 	"github.com/sergiorra/sushi-api-go/pkg/adding"
 	"github.com/sergiorra/sushi-api-go/pkg/getting"
 	"github.com/sergiorra/sushi-api-go/pkg/modifying"
+	"github.com/sergiorra/sushi-api-go/pkg/removing"
 
-	"github.com/sergiorra/sushi-api-go/cmd/sample-data"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/inmem"
+
+	"github.com/sergiorra/sushi-api-go/cmd/sample-data"
 )
 
 func TestGetSushis(t *testing.T) {
@@ -27,12 +27,11 @@ func TestGetSushis(t *testing.T) {
 	}
 
 	s := buildServer()
+	resRecorder := httptest.NewRecorder()
 
-	rec := httptest.NewRecorder()
+	s.GetSushis(resRecorder, req)
 
-	s.GetSushis(rec, req)
-
-	res := rec.Result()
+	res := resRecorder.Result()
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		t.Errorf("expected %d, got: %d", http.StatusOK, res.StatusCode)
@@ -77,10 +76,10 @@ func TestGetSushi(t *testing.T) {
 
 			s := buildServer()
 
-			rec := httptest.NewRecorder()
-			s.Router().ServeHTTP(rec, req)
+			resRecorder := httptest.NewRecorder()
+			s.Router().ServeHTTP(resRecorder, req)
 
-			res := rec.Result()
+			res := resRecorder.Result()
 
 			defer res.Body.Close()
 			if tt.status != res.StatusCode {
@@ -98,7 +97,7 @@ func TestGetSushi(t *testing.T) {
 					t.Fatalf("could not unmarshall response %v", err)
 				}
 
-				if *got != *tt.s {
+				if got.ID != tt.s.ID {
 					t.Fatalf("expected %v, got: %v", tt.s, got)
 				}
 			}
@@ -119,10 +118,10 @@ func TestAddSushi(t *testing.T) {
 		t.Fatalf("could not created request: %v", err)
 	}
 	s := buildServer()
-	rec := httptest.NewRecorder()
+	resRecorder := httptest.NewRecorder()
 
-	s.AddSushi(rec, req)
-	res := rec.Result()
+	s.AddSushi(resRecorder, req)
+	res := resRecorder.Result()
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusCreated {
@@ -141,10 +140,10 @@ func TestModifySushi(t *testing.T) {
 		t.Fatalf("could not created request: %v", err)
 	}
 	s := buildServer()
-	rec := httptest.NewRecorder()
+	resRecorder := httptest.NewRecorder()
 
-	s.ModifySushi(rec, req)
-	res := rec.Result()
+	s.ModifySushi(resRecorder, req)
+	res := resRecorder.Result()
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusNoContent {
@@ -152,7 +151,7 @@ func TestModifySushi(t *testing.T) {
 	}
 }
 
-func TestRemoveGopher(t *testing.T) {
+func TestRemoveSushi(t *testing.T) {
 
 	uri := fmt.Sprintf("/sushi/%s", "01D3XZ38KLE")
 	req, err := http.NewRequest("DELETE", uri, nil)
@@ -162,10 +161,10 @@ func TestRemoveGopher(t *testing.T) {
 
 	s := buildServer()
 
-	rec := httptest.NewRecorder()
-	s.Router().ServeHTTP(rec, req)
+	resRecorder := httptest.NewRecorder()
+	s.Router().ServeHTTP(resRecorder, req)
 
-	res := rec.Result()
+	res := resRecorder.Result()
 
 	defer res.Body.Close()
 	if http.StatusNoContent != res.StatusCode {
