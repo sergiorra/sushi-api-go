@@ -98,7 +98,7 @@ func TestGetSushi(t *testing.T) {
 				}
 
 				if got.ID != tt.s.ID {
-					t.Fatalf("expected %v, got: %v", tt.s, got)
+					t.Fatalf("expected %v, got: %v", *tt.s, *got)
 				}
 			}
 		})
