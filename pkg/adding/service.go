@@ -1,12 +1,13 @@
 package adding
 
 import (
+	"context"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
 // Service provides adding operations
 type Service interface {
-	AddSushi(ID, ImageNumber, Name string, Ingredients []string) error
+	AddSushi(ctx context.Context, ID, ImageNumber, Name string, Ingredients []string) error
 }
 
 type service struct {
@@ -19,7 +20,7 @@ func NewService(repository sushi.Repository) Service {
 }
 
 // AddSushi adds the given sushi to storage
-func (s *service) AddSushi(ID, ImageNumber, Name string, Ingredients []string) error {
+func (s *service) AddSushi(ctx context.Context, ID, ImageNumber, Name string, Ingredients []string) error {
 	sushi := sushi.New(ID, ImageNumber, Name, Ingredients)
-	return s.repository.CreateSushi(sushi)
+	return s.repository.CreateSushi(ctx, sushi)
 }

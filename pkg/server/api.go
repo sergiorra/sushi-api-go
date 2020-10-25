@@ -45,14 +45,14 @@ func (a *api) Router() http.Handler {
 }
 
 func (a *api) GetSushis(w http.ResponseWriter, r *http.Request) {
-	sushis, _ := a.getting.GetSushis()
+	sushis, _ := a.getting.GetSushis(r.Context())
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(sushis)
 }
 
 func (a *api) GetSushi(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	sushi, err := a.getting.GetSushiByID(params["ID"])
+	sushi, err := a.getting.GetSushiByID(r.Context(), params["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
@@ -84,7 +84,7 @@ func (a *api) AddSushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.adding.AddSushi(s.ID, s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := a.adding.AddSushi(r.Context(), s.ID, s.ImageNumber, s.Name, s.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't create a sushi")
 		return
@@ -113,7 +113,7 @@ func (a *api) ModifySushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	if err := a.modifying.ModifySushi(vars["ID"], s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := a.modifying.ModifySushi(r.Context(), vars["ID"], s.ImageNumber, s.Name, s.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't modify a sushi")
 		return
@@ -125,7 +125,7 @@ func (a *api) ModifySushi(w http.ResponseWriter, r *http.Request) {
 // RemoveSushi remove a sushi
 func (a *api) RemoveSushi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	a.removing.RemoveSushi(vars["ID"])
+	a.removing.RemoveSushi(r.Context(), vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 }

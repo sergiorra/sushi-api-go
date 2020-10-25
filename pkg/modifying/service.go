@@ -1,12 +1,13 @@
 package modifying
 
 import (
+	"context"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
 // Service provides modifying operations
 type Service interface {
-	ModifySushi(ID, ImageNumber, Name string, Ingredients []string) error
+	ModifySushi(ctx context.Context, ID, ImageNumber, Name string, Ingredients []string) error
 }
 
 type service struct {
@@ -19,7 +20,7 @@ func NewService(repository sushi.Repository) Service {
 }
 
 // ModifySushi modify a sushi data
-func (s *service) ModifySushi(ID, ImageNumber, Name string, Ingredients []string) error {
+func (s *service) ModifySushi(ctx context.Context, ID, ImageNumber, Name string, Ingredients []string) error {
 	sushi := sushi.New(ID, ImageNumber, Name, Ingredients)
-	return s.repository.UpdateSushi(ID, sushi)
+	return s.repository.UpdateSushi(ctx, ID, sushi)
 }

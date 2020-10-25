@@ -1,5 +1,7 @@
 package sushi
 
+import "context"
+
 // Sushi defines the properties of a sushi to be listed
 type Sushi struct {
 	ID          string 		`json:"id"`
@@ -20,9 +22,9 @@ func New(ID, ImageNumber, Name string, Ingredients []string) *Sushi {
 
 // Repository provides access to the sushi storage
 type Repository interface {
-	CreateSushi(s *Sushi) error
-	GetSushis() ([]Sushi, error)
-	DeleteSushi(ID string) error
-	UpdateSushi(ID string, s *Sushi) error
-	GetSushiByID(ID string) (*Sushi, error)
+	CreateSushi(ctx context.Context, s *Sushi) error
+	GetSushis(ctx context.Context) ([]Sushi, error)
+	DeleteSushi(ctx context.Context, ID string) error
+	UpdateSushi(ctx context.Context, ID string, s *Sushi) error
+	GetSushiByID(ctx context.Context, ID string) (*Sushi, error)
 }

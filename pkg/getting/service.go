@@ -1,13 +1,14 @@
 package getting
 
 import (
+	"context"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 )
 
 // Service provides getting operations
 type Service interface {
-	GetSushis() ([]sushi.Sushi, error)
-	GetSushiByID(ID string) (*sushi.Sushi, error)
+	GetSushis(ctx context.Context) ([]sushi.Sushi, error)
+	GetSushiByID(ctx context.Context, ID string) (*sushi.Sushi, error)
 }
 
 type service struct {
@@ -20,12 +21,12 @@ func NewService(repository sushi.Repository) Service {
 }
 
 // GetSushis returns all sushis
-func (s *service) GetSushis() ([]sushi.Sushi, error) {
-	return s.repository.GetSushis()
+func (s *service) GetSushis(ctx context.Context) ([]sushi.Sushi, error) {
+	return s.repository.GetSushis(ctx)
 }
 
 // GetSushiByID returns a sushi
-func (s *service) GetSushiByID(ID string) (*sushi.Sushi, error) {
-	return s.repository.GetSushiByID(ID)
+func (s *service) GetSushiByID(ctx context.Context, ID string) (*sushi.Sushi, error) {
+	return s.repository.GetSushiByID(ctx, ID)
 }
 
