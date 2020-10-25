@@ -11,7 +11,10 @@ import (
 	"github.com/sergiorra/sushi-api-go/pkg/removing"
 )
 
-type api struct {
+type server struct {
+	serverID string
+	httpAddr string
+
 	router http.Handler
 	getting  getting.Service
 	modifying  modifying.Service
@@ -28,35 +31,43 @@ type Server interface {
 	RemoveSushi(w http.ResponseWriter, r *http.Request)
 }
 
-func New(gS getting.Service, aS adding.Service, mS modifying.Service, rS removing.Service) Server {
-	a := &api{getting: gS, adding: aS, modifying: mS, removing: rS}
+func New(serverID string, gS getting.Service, aS adding.Service, mS modifying.Service, rS removing.Service) Server {
+	a := &server{serverID: serverID, getting: gS, adding: aS, modifying: mS, removing: rS}
+	router(a)
+	return a
+}
+
+func router(a *server) {
 	r := mux.NewRouter()
+
+	r.Use(newServerMiddleware(a.serverID))
+
 	r.HandleFunc("/sushi", a.GetSushis).Methods(http.MethodGet)
 	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.GetSushi).Methods(http.MethodGet)
 	r.HandleFunc("/sushi", a.AddSushi).Methods(http.MethodPost)
 	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.ModifySushi).Methods(http.MethodPut)
 	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.RemoveSushi).Methods(http.MethodDelete)
+
 	a.router = r
-	return a
 }
 
-func (a *api) Router() http.Handler {
+func (a *server) Router() http.Handler {
 	return a.router
 }
 
-func (a *api) GetSushis(w http.ResponseWriter, r *http.Request) {
-	sushis, _ := a.getting.GetSushis()
+func (a *server) GetSushis(w http.ResponseWriter, r *http.Request) {
+	sushis, _ := a.getting.GetSushis(r.Context())
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(sushis)
 }
 
-func (a *api) GetSushi(w http.ResponseWriter, r *http.Request) {
+func (a *server) GetSushi(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	sushi, err := a.getting.GetSushiByID(params["ID"])
+	sushi := a.getting.GetSushiByID(r.Context(), params["ID"])
 	w.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound) // We use not found for simplicity
-		json.NewEncoder(w).Encode("Sushi Not found")
+	if sushi == nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode("Sushi Not found")
 		return
 	}
 
@@ -71,7 +82,7 @@ type addSushiRequest struct {
 }
 
 // AddSushi save a sushi
-func (a *api) AddSushi(w http.ResponseWriter, r *http.Request) {
+func (a *server) AddSushi(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	var s addSushiRequest
@@ -84,7 +95,7 @@ func (a *api) AddSushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.adding.AddSushi(s.ID, s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := a.adding.AddSushi(r.Context(), s.ID, s.ImageNumber, s.Name, s.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't create a sushi")
 		return
@@ -100,7 +111,7 @@ type modifySushiRequest struct {
 }
 
 // ModifySushi modify sushi data
-func (a *api) ModifySushi(w http.ResponseWriter, r *http.Request) {
+func (a *server) ModifySushi(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	var s modifySushiRequest
@@ -113,7 +124,7 @@ func (a *api) ModifySushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	if err := a.modifying.ModifySushi(vars["ID"], s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := a.modifying.ModifySushi(r.Context(), vars["ID"], s.ImageNumber, s.Name, s.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't modify a sushi")
 		return
@@ -123,9 +134,9 @@ func (a *api) ModifySushi(w http.ResponseWriter, r *http.Request) {
 }
 
 // RemoveSushi remove a sushi
-func (a *api) RemoveSushi(w http.ResponseWriter, r *http.Request) {
+func (a *server) RemoveSushi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	a.removing.RemoveSushi(vars["ID"])
+	a.removing.RemoveSushi(r.Context(), vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 }
