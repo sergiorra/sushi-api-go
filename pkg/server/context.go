@@ -5,17 +5,17 @@ import (
 )
 
 var (
-	contextKeyServerID        = contextKey("id")
+	contextKeyServerID        = contextKey("Id")
 	contextKeyXForwardedFor   = contextKey("xForwardedFor")
 	contextKeyXForwardedProto = contextKey("xForwardedProto")
-	contextKeyEndpoint        = contextKey("endpoint")
-	contextKeyClientIP        = contextKey("clientIP")
+	contextKeyEndpoint        = contextKey("Endpoint")
+	contextKeyClientIP        = contextKey("ClientIP")
 )
 
 type contextKey string
 
 func (c contextKey) String() string {
-	return "server" + string(c)
+	return "Server" + string(c)
 }
 
 // ID gets the name server from context
