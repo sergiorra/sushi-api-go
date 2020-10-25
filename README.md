@@ -35,10 +35,9 @@ There is no documentation yet
 ## ⚙️ Tech Stack
 
 - Go
-- Gorilla mux
-- Logrus
 - Makefile
 - Github Actions
+- More to come...
 
 ## 📝 License
 
