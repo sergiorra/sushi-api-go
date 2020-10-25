@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/sergiorra/sushi-api-go/pkg/log"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -184,10 +185,10 @@ func sushiSample() *sushi.Sushi {
 
 func buildServer() Server {
 	repo := inmem.NewRepository(sample.Sushis)
-	fetching := getting.NewService(repo)
+	fetching := getting.NewService(repo, log.NewNoopLogger())
 	adding := adding.NewService(repo)
 	modifying := modifying.NewService(repo)
 	removing := removing.NewService(repo)
 
-	return New(fetching, adding, modifying, removing)
+	return New("test", fetching, adding, modifying, removing)
 }

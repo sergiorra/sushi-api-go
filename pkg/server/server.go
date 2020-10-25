@@ -37,33 +37,33 @@ func New(serverID string, gS getting.Service, aS adding.Service, mS modifying.Se
 	return a
 }
 
-func router(a *server) {
+func router(s *server) {
 	r := mux.NewRouter()
 
-	r.Use(newServerMiddleware(a.serverID))
+	r.Use(newServerMiddleware(s.serverID))
 
-	r.HandleFunc("/sushi", a.GetSushis).Methods(http.MethodGet)
-	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.GetSushi).Methods(http.MethodGet)
-	r.HandleFunc("/sushi", a.AddSushi).Methods(http.MethodPost)
-	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.ModifySushi).Methods(http.MethodPut)
-	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", a.RemoveSushi).Methods(http.MethodDelete)
+	r.HandleFunc("/sushi", s.GetSushis).Methods(http.MethodGet)
+	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", s.GetSushi).Methods(http.MethodGet)
+	r.HandleFunc("/sushi", s.AddSushi).Methods(http.MethodPost)
+	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", s.ModifySushi).Methods(http.MethodPut)
+	r.HandleFunc("/sushi/{ID:[a-zA-Z0-9_]+}", s.RemoveSushi).Methods(http.MethodDelete)
 
-	a.router = r
+	s.router = r
 }
 
-func (a *server) Router() http.Handler {
-	return a.router
+func (s *server) Router() http.Handler {
+	return s.router
 }
 
-func (a *server) GetSushis(w http.ResponseWriter, r *http.Request) {
-	sushis, _ := a.getting.GetSushis(r.Context())
+func (s *server) GetSushis(w http.ResponseWriter, r *http.Request) {
+	sushis, _ := s.getting.GetSushis(r.Context())
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(sushis)
 }
 
-func (a *server) GetSushi(w http.ResponseWriter, r *http.Request) {
+func (s *server) GetSushi(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	sushi := a.getting.GetSushiByID(r.Context(), params["ID"])
+	sushi := s.getting.GetSushiByID(r.Context(), params["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	if sushi == nil {
 		w.WriteHeader(http.StatusNotFound)
@@ -82,11 +82,11 @@ type addSushiRequest struct {
 }
 
 // AddSushi save a sushi
-func (a *server) AddSushi(w http.ResponseWriter, r *http.Request) {
+func (s *server) AddSushi(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
-	var s addSushiRequest
-	err := decoder.Decode(&s)
+	var sushi addSushiRequest
+	err := decoder.Decode(&sushi)
 
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
@@ -95,7 +95,7 @@ func (a *server) AddSushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := a.adding.AddSushi(r.Context(), s.ID, s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := s.adding.AddSushi(r.Context(), sushi.ID, sushi.ImageNumber, sushi.Name, sushi.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't create a sushi")
 		return
@@ -111,11 +111,11 @@ type modifySushiRequest struct {
 }
 
 // ModifySushi modify sushi data
-func (a *server) ModifySushi(w http.ResponseWriter, r *http.Request) {
+func (s *server) ModifySushi(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
-	var s modifySushiRequest
-	err := decoder.Decode(&s)
+	var sushi modifySushiRequest
+	err := decoder.Decode(&sushi)
 
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
@@ -124,7 +124,7 @@ func (a *server) ModifySushi(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	vars := mux.Vars(r)
-	if err := a.modifying.ModifySushi(r.Context(), vars["ID"], s.ImageNumber, s.Name, s.Ingredients); err != nil {
+	if err := s.modifying.ModifySushi(r.Context(), vars["ID"], sushi.ImageNumber, sushi.Name, sushi.Ingredients); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode("Can't modify a sushi")
 		return
@@ -134,9 +134,9 @@ func (a *server) ModifySushi(w http.ResponseWriter, r *http.Request) {
 }
 
 // RemoveSushi remove a sushi
-func (a *server) RemoveSushi(w http.ResponseWriter, r *http.Request) {
+func (s *server) RemoveSushi(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	a.removing.RemoveSushi(r.Context(), vars["ID"])
+	s.removing.RemoveSushi(r.Context(), vars["ID"])
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)
 }
