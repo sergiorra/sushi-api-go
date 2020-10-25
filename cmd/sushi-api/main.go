@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	_ "github.com/joho/godotenv/autoload"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 	"github.com/sergiorra/sushi-api-go/pkg/adding"
 	"github.com/sergiorra/sushi-api-go/pkg/getting"
