@@ -43,6 +43,19 @@ func (r *sushiRepository) GetSushis(ctx context.Context) ([]sushi.Sushi, error) 
 	return values, nil
 }
 
+func (r *sushiRepository) GetSushiByID(ctx context.Context, ID string) (*sushi.Sushi, error) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
+
+	for _, v := range r.sushis {
+		if v.ID == ID {
+			return &v, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Error has ocurred while finding sushi %s", ID)
+}
+
 func (r *sushiRepository) DeleteSushi(ctx context.Context, ID string) error {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
@@ -56,19 +69,6 @@ func (r *sushiRepository) UpdateSushi(ctx context.Context, ID string, s *sushi.S
 	defer r.mtx.Unlock()
 	r.sushis[ID] = *s
 	return nil
-}
-
-func (r *sushiRepository) GetSushiByID(ctx context.Context, ID string) (*sushi.Sushi, error) {
-	r.mtx.Lock()
-	defer r.mtx.Unlock()
-
-	for _, v := range r.sushis {
-		if v.ID == ID {
-			return &v, nil
-		}
-	}
-
-	return nil, fmt.Errorf("The ID %s does not exist", ID)
 }
 
 func (r *sushiRepository) checkIfExists(ctx context.Context, ID string) error {

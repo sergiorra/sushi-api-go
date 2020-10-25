@@ -2,7 +2,6 @@ package logrus
 
 import (
 	"context"
-
 	"github.com/sirupsen/logrus"
 
 	"github.com/sergiorra/sushi-api-go/pkg/log"
@@ -31,8 +30,8 @@ var (
 )
 
 func (l *logger) UnexpectedError(ctx context.Context, err error) {
-	l.WithDefaultFields(ctx).WithField("logid", unexpectedErrorMessage.id).
-		Errorf(unexpectedErrorMessage.message, err)
+	l.WithDefaultFields(ctx).WithField("LogId", unexpectedErrorMessage.id).
+		Printf(unexpectedErrorMessage.message, err)
 }
 
 func (l *logger) WithDefaultFields(ctx context.Context) *logrus.Entry {
@@ -40,9 +39,9 @@ func (l *logger) WithDefaultFields(ctx context.Context) *logrus.Entry {
 	endpoint, _ := server.Endpoint(ctx)
 	clientIP, _ := server.ClientIP(ctx)
 	fields := logrus.Fields{
-		"serverid": serverID,
-		"endpoint": endpoint,
-		"clientip": clientIP,
+		"ServerId": serverID,
+		"Endpoint": endpoint,
+		"ClientIp": clientIP,
 	}
 
 	if xForwardedFor, ok := server.XForwardedFor(ctx); ok {
