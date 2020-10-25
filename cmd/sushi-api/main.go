@@ -46,6 +46,6 @@ func main() {
 	s := server.New(*serverID, gS, aS, mS, rS)
 
 	fmt.Println("The sushi server is on tap now:", httpAddr)
-	log.Fatal(http.ListenAndServe(":8080", s.Router()))
+	log.Fatal(http.ListenAndServe(httpAddr, s.Router()))
 
 }
