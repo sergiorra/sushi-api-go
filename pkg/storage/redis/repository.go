@@ -128,7 +128,7 @@ func (s sushiRepository) UpdateSushi(ctx context.Context, ID string, sushi *sush
 	}
 
 	result, err := conn.Do("SET", ID, string(bytes), onlyIfExists)
-	if result != nil {
+	if result == nil {
 		return errors.New("not found")
 	}
 	return err
