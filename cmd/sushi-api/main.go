@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sergiorra/sushi-api-go/pkg/log/logrus"
+	"github.com/sergiorra/sushi-api-go/pkg/storage/cockroach"
 	"log"
 	"net/http"
 	"os"
@@ -32,10 +33,12 @@ func main() {
 	port := flag.Int("port", defaultPort, "define port of the server")
 	serverID := flag.String("server-id", defaultServerID, "define server identifier")
 
+	database := flag.String("database", "inmem", "initialize the api using the given db engine")
+
 	var sushis map[string]sushi.Sushi
 	logger := logrus.NewLogger()
 
-	repo := inmem.NewRepository(sushis)
+	repo := initializeRepo(database, sushis)
 	gS := getting.NewService(repo, logger)
 	aS := adding.NewService(repo)
 	mS := modifying.NewService(repo)
@@ -48,4 +51,26 @@ func main() {
 	fmt.Println("The sushi server is on tap now:", httpAddr)
 	log.Fatal(http.ListenAndServe(httpAddr, s.Router()))
 
+}
+
+func initializeRepo(database *string, sushis map[string]sushi.Sushi) sushi.Repository {
+	var repo sushi.Repository
+	switch *database {
+	case "cockroach":
+		repo = newCockroachRepository()
+	default:
+		repo = inmem.NewRepository(sushis)
+	}
+	return repo
+}
+
+func newCockroachRepository() sushi.Repository {
+	cockroachAddr := os.Getenv("COCKROACH_ADDR")
+	cockroachDBName := os.Getenv("COCKROACH_DB")
+
+	cockroachConn, err := cockroach.NewConn(cockroachAddr, cockroachDBName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return cockroach.NewRepository(cockroachConn)
 }
