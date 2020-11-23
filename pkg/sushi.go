@@ -1,6 +1,9 @@
 package sushi
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // Sushi defines the properties of a sushi to be listed
 type Sushi struct {
@@ -8,6 +11,8 @@ type Sushi struct {
 	ImageNumber string 		`json:"imageNumber,omitempty"`
 	Name        string 		`json:"name,omitempty"`
 	Ingredients []string 	`json:"ingredients,omitempty"`
+	CreatedAt 	*time.Time `json:"-"`
+	UpdatedAt 	*time.Time `json:"-"`
 }
 
 // New creates a sushi
