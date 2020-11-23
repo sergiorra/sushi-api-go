@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sergiorra/sushi-api-go/pkg/log/logrus"
-	"github.com/sergiorra/sushi-api-go/pkg/storage/cockroach"
 	"log"
 	"net/http"
 	"os"
@@ -14,9 +12,11 @@ import (
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 	"github.com/sergiorra/sushi-api-go/pkg/adding"
 	"github.com/sergiorra/sushi-api-go/pkg/getting"
+	"github.com/sergiorra/sushi-api-go/pkg/log/logrus"
 	"github.com/sergiorra/sushi-api-go/pkg/modifying"
 	"github.com/sergiorra/sushi-api-go/pkg/removing"
 	"github.com/sergiorra/sushi-api-go/pkg/server"
+	"github.com/sergiorra/sushi-api-go/pkg/storage/cockroach"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/inmem"
 )
 
@@ -27,14 +27,14 @@ func main() {
 		defaultServerID = fmt.Sprintf("%s-%s", os.Getenv("SUSHIAPI_NAME"), hostName)
 		defaultHost     = os.Getenv("SUSHIAPI_SERVER_HOST")
 		defaultPort, _  = strconv.Atoi(os.Getenv("SUSHIAPI_SERVER_PORT"))
+		defaultDB		= "inmem"
 	)
 
 	host := flag.String("host", defaultHost, "define host of the server")
 	port := flag.Int("port", defaultPort, "define port of the server")
 	serverID := flag.String("server-id", defaultServerID, "define server identifier")
-
-	database := flag.String("database", "inmem", "initialize the api using the given db engine")
-
+	database := flag.String("database", defaultDB, "initialize the api using the given db engine")
+	flag.Parse()
 	var sushis map[string]sushi.Sushi
 	logger := logrus.NewLogger()
 
