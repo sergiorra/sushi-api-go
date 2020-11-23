@@ -35,6 +35,7 @@ func main() {
 	serverID := flag.String("server-id", defaultServerID, "define server identifier")
 	database := flag.String("database", defaultDB, "initialize the api using the given db engine")
 	flag.Parse()
+
 	var sushis map[string]sushi.Sushi
 	logger := logrus.NewLogger()
 
