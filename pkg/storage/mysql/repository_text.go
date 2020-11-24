@@ -8,6 +8,7 @@ import (
 
 	sushiapi "github.com/sergiorra/sushi-api-go/pkg"
 
+	// sqlmock simulates any sql driver behavior in tests, without needing a real database connection
 	"github.com/DATA-DOG/go-sqlmock"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
