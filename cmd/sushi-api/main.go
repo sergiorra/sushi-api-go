@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/sergiorra/sushi-api-go/pkg/storage/mysql"
 	"log"
 	"net/http"
 	"os"
@@ -35,6 +36,7 @@ func main() {
 	serverID := flag.String("server-id", defaultServerID, "define server identifier")
 	database := flag.String("database", defaultDB, "initialize the api using the given db engine")
 	flag.Parse()
+
 	var sushis map[string]sushi.Sushi
 	logger := logrus.NewLogger()
 
@@ -58,6 +60,8 @@ func initializeRepo(database *string, sushis map[string]sushi.Sushi) sushi.Repos
 	switch *database {
 	case "cockroach":
 		repo = newCockroachRepository()
+	case "mysql":
+		repo = newMySQLRepository()
 	default:
 		repo = inmem.NewRepository(sushis)
 	}
@@ -73,4 +77,15 @@ func newCockroachRepository() sushi.Repository {
 		log.Fatal(err)
 	}
 	return cockroach.NewRepository(cockroachConn)
+}
+
+func newMySQLRepository() sushi.Repository {
+	mysqlAddr := os.Getenv("MYSQL_ADDR")
+	mysqlDBName := os.Getenv("MYSQL_DB")
+
+	mysqlConn, err := mysql.NewConn(mysqlAddr, mysqlDBName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return mysql.NewRepository("gophers", mysqlConn)
 }

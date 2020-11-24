@@ -17,7 +17,7 @@ import (
 	$ cockroach sql --insecure
 	$ create database sushiapi;
 	$ set database = sushiapi;
-	$ CREATE TABLE gophers (
+	$ CREATE TABLE sushis (
 			id STRING(32),
 			image_number STRING(100) NOT NULL,
 			name STRING NULL,
