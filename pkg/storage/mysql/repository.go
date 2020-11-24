@@ -6,6 +6,7 @@ import (
 	"errors"
 	"time"
 
+	// sqlbuilder builds SQL string automatically given some arguments (like table, object,...)
 	"github.com/huandu/go-sqlbuilder"
 	_ "github.com/lib/pq"
 	sushiapi "github.com/sergiorra/sushi-api-go/pkg"
@@ -21,17 +22,16 @@ func NewRepository(table string, db *sql.DB) sushiapi.Repository {
 	return sushiRepository{table: table, db: db}
 }
 
-// CreateGopher satisfies the sushiapi.Repository interface
+// CreateSushi satisfies the sushiapi.Repository interface
 func (r sushiRepository) CreateSushi(ctx context.Context, g *sushiapi.Sushi) error {
 	insertBuilder := sqlbuilder.NewStruct(new(sqlSushi)).InsertInto(
 		r.table,
 		sqlSushi{
-			ID:        g.ID,
-			Name:      g.Name,
-			Image:     g.Image,
-			Age:       g.Age,
-			CreatedAt: g.CreatedAt,
-			UpdatedAt: g.UpdatedAt,
+			ID:        		g.ID,
+			ImageNumber:    g.ImageNumber,
+			Name:     		g.Name,
+			CreatedAt: 		g.CreatedAt,
+			UpdatedAt: 		g.UpdatedAt,
 		},
 	)
 
@@ -40,10 +40,11 @@ func (r sushiRepository) CreateSushi(ctx context.Context, g *sushiapi.Sushi) err
 	return err
 }
 
+// GetSushis satisfies the sushiapi.Repository interface
 func (r sushiRepository) GetSushis(ctx context.Context) ([]sushiapi.Sushi, error) {
-	sqlGopherStruct := sqlbuilder.NewStruct(new(sqlSushi))
+	sqlSushiStruct := sqlbuilder.NewStruct(new(sqlSushi))
 
-	selectBuilder := sqlGopherStruct.SelectFrom(r.table)
+	selectBuilder := sqlSushiStruct.SelectFrom(r.table)
 	query, args := selectBuilder.Build()
 
 	rows, err := r.db.QueryContext(ctx, query, args...)
@@ -57,24 +58,24 @@ func (r sushiRepository) GetSushis(ctx context.Context) ([]sushiapi.Sushi, error
 	for rows.Next() {
 		sqlSushi := sqlSushi{}
 
-		err := rows.Scan(sqlGopherStruct.Addr(&sqlSushi)...)
+		err := rows.Scan(sqlSushiStruct.Addr(&sqlSushi)...)
 		if err != nil {
 			return nil, err
 		}
 
 		sushis = append(sushis, sushiapi.Sushi{
-			ID:        sqlSushi.ID,
-			Name:      sqlSushi.Name,
-			Image:     sqlSushi.Image,
-			Age:       sqlSushi.Age,
-			CreatedAt: sqlSushi.CreatedAt,
-			UpdatedAt: sqlSushi.UpdatedAt,
+			ID:        		sqlSushi.ID,
+			ImageNumber:    sqlSushi.ImageNumber,
+			Name:     		sqlSushi.Name,
+			CreatedAt: 		sqlSushi.CreatedAt,
+			UpdatedAt: 		sqlSushi.UpdatedAt,
 		})
 	}
 
 	return sushis, nil
 }
 
+// DeleteSushi satisfies the sushiapi.Repository interface
 func (r sushiRepository) DeleteSushi(ctx context.Context, ID string) error {
 	deleteBuilder := sqlbuilder.NewStruct(new(sqlSushi)).DeleteFrom(r.table)
 	query, args := deleteBuilder.Where(
@@ -85,16 +86,16 @@ func (r sushiRepository) DeleteSushi(ctx context.Context, ID string) error {
 	return err
 }
 
-func (r sushiRepository) UpdateSushi(ctx context.Context, ID string, g sushiapi.Sushi) error {
+// UpdateSushi satisfies the sushiapi.Repository interface
+func (r sushiRepository) UpdateSushi(ctx context.Context, ID string, g *sushiapi.Sushi) error {
 	updateBuilder := sqlbuilder.NewStruct(new(sqlSushi)).Update(
 		r.table,
 		sqlSushi{
-			ID:        g.ID,
-			Name:      g.Name,
-			Image:     g.Image,
-			Age:       g.Age,
-			CreatedAt: g.CreatedAt,
-			UpdatedAt: g.UpdatedAt,
+			ID:        		g.ID,
+			ImageNumber:    g.ImageNumber,
+			Name:     		g.Name,
+			CreatedAt: 		g.CreatedAt,
+			UpdatedAt: 		g.UpdatedAt,
 		},
 	)
 
@@ -115,10 +116,11 @@ func (r sushiRepository) UpdateSushi(ctx context.Context, ID string, g sushiapi.
 	return nil
 }
 
+// GetSushiByID satisfies the sushiapi.Repository interface
 func (r sushiRepository) GetSushiByID(ctx context.Context, ID string) (*sushiapi.Sushi, error) {
-	sqlGopherStruct := sqlbuilder.NewStruct(new(sqlSushi))
+	sqlSushiStruct := sqlbuilder.NewStruct(new(sqlSushi))
 
-	selectBuilder := sqlGopherStruct.SelectFrom(r.table)
+	selectBuilder := sqlSushiStruct.SelectFrom(r.table)
 
 	query, args := selectBuilder.Where(
 		selectBuilder.Equal("id", ID),
@@ -128,26 +130,24 @@ func (r sushiRepository) GetSushiByID(ctx context.Context, ID string) (*sushiapi
 
 	sqlSushi := sqlSushi{}
 
-	err := row.Scan(sqlGopherStruct.Addr(&sqlSushi)...)
+	err := row.Scan(sqlSushiStruct.Addr(&sqlSushi)...)
 	if err != nil {
 		return nil, err
 	}
 
 	return &sushiapi.Sushi{
-		ID:        sqlSushi.ID,
-		Name:      sqlSushi.Name,
-		Image:     sqlSushi.Image,
-		Age:       sqlSushi.Age,
-		CreatedAt: sqlSushi.CreatedAt,
-		UpdatedAt: sqlSushi.UpdatedAt,
+		ID:        		sqlSushi.ID,
+		ImageNumber:    sqlSushi.ImageNumber,
+		Name:     		sqlSushi.Name,
+		CreatedAt: 		sqlSushi.CreatedAt,
+		UpdatedAt: 		sqlSushi.UpdatedAt,
 	}, nil
 }
 
 type sqlSushi struct {
-	ID        string     `db:"id"`
-	Name      string     `db:"name"`
-	Image     string     `db:"image"`
-	Age       int        `db:"age"`
-	CreatedAt *time.Time `db:"created_at"`
-	UpdatedAt *time.Time `db:"updated_at"`
+	ID        		string     `db:"id"`
+	ImageNumber     string     `db:"image_number"`
+	Name     		string     `db:"name"`
+	CreatedAt 		*time.Time `db:"created_at"`
+	UpdatedAt 		*time.Time `db:"updated_at"`
 }
