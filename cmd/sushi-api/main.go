@@ -3,13 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sergiorra/sushi-api-go/pkg/storage/mysql"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 
-	_ "github.com/joho/godotenv/autoload"
 	sushi "github.com/sergiorra/sushi-api-go/pkg"
 	"github.com/sergiorra/sushi-api-go/pkg/adding"
 	"github.com/sergiorra/sushi-api-go/pkg/getting"
@@ -19,6 +17,9 @@ import (
 	"github.com/sergiorra/sushi-api-go/pkg/server"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/cockroach"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/inmem"
+	"github.com/sergiorra/sushi-api-go/pkg/storage/mysql"
+
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
