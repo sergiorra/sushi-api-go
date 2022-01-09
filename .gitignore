@@ -11,9 +11,10 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# IntelliJ-based editors
+/.idea/
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
 sushi-api-go
-
-scripts.txt
