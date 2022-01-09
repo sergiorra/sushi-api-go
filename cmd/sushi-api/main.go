@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/sergiorra/sushi-api-go/pkg/storage/mysql"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +18,7 @@ import (
 	"github.com/sergiorra/sushi-api-go/pkg/server"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/cockroach"
 	"github.com/sergiorra/sushi-api-go/pkg/storage/inmem"
+	"github.com/sergiorra/sushi-api-go/pkg/storage/mysql"
 )
 
 func main() {
